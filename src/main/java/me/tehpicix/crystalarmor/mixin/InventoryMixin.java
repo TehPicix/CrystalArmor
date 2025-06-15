@@ -7,7 +7,6 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.text.Text;
 
 @Mixin(MinecraftServer.class)
 public class InventoryMixin {
@@ -15,15 +14,6 @@ public class InventoryMixin {
 	private void init(CallbackInfo info) {
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {
 
-
-
-
-			if (client.player != null) {
-
-				client.player.sendMessage(Text.literal("ticked"), false);
-
-			}
-			
 			
 		});
 	}
