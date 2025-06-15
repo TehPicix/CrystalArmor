@@ -9,7 +9,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.minecraft.server.MinecraftServer;
 
 @Mixin(MinecraftServer.class)
-public class InventoryMixin {
+public class WorldMixin {
 	@Inject(at = @At("HEAD"), method = "loadWorld")
 	private void init(CallbackInfo info) {
 		ClientTickEvents.END_CLIENT_TICK.register(client -> {

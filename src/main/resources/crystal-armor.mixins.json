@@ -3,7 +3,7 @@
 	"package": "me.tehpicix.crystalarmor.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"InventoryMixin"
+		"WorldMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
