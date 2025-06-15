@@ -7,13 +7,8 @@
 	"authors": [
 		"TehPicix"
 	],
-	"contact": {
-		"homepage": "https://fabricmc.net/",
-		"sources": "https://github.com/FabricMC/fabric-example-mod"
-	},
-	"license": "CC0-1.0",
-	"icon": "assets/crystal-armor/icon.png",
-	"environment": "*",
+	"icon": "assets/icon.png",
+	"environment": "client",
 	"entrypoints": {
 		"main": [
 			"me.tehpicix.crystalarmor.CrystalArmor"
