@@ -28,7 +28,7 @@ public class ConfigScreen {
             .build());
         
         general.addEntry(entryBuilder
-            .startIntSlider(Text.literal("Crystal Radius"), Config.INSTANCE.radius, 0, 25)
+            .startIntSlider(Text.literal("Crystal Radius"), Config.INSTANCE.radius, 0, 11)
             .setDefaultValue(11)
             .setTooltip(Text.literal("How close before the armor swap occurs"))
             .setSaveConsumer(newValue -> {
@@ -38,9 +38,9 @@ public class ConfigScreen {
             .build());
             
         general.addEntry(entryBuilder
-            .startBooleanToggle(Text.literal("Require Path Tracing"), true)
+            .startBooleanToggle(Text.literal("Require Line of Sight"), true)
             .setDefaultValue(true)
-            .setTooltip(Text.literal("Requires line of sight to the crystal for swapping"))
+            .setTooltip(Text.literal("If enabled, uses ray tracing to determine if the player has line of sight to the crystal"))
             .setSaveConsumer(newValue -> {
                 Config.INSTANCE.useTracing = newValue;
                 Config.save();
@@ -51,7 +51,7 @@ public class ConfigScreen {
             .startIntField(Text.literal("Cooldown Time"), Config.INSTANCE.cooldown)
             .setDefaultValue(20)
             .setTooltip(Text
-            .literal("Leave your blast resistant armor on for this many ticks once its safe to swap back"))
+            .literal("Once its safe, how long before swapping back to original armor? (in ticks)"))
             .setSaveConsumer(newValue -> {
                 Config.INSTANCE.cooldown = newValue;
                 Config.save();
