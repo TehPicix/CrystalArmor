@@ -3,9 +3,9 @@
 	"id": "crystal-armor",
 	"version": "${version}",
 	"name": "Crystal Armor",
-	"description": "This is an example description! Tell everyone what your mod is about!",
+	"description": "Swap to your most blast resistance armor when around end crystals.",
 	"authors": [
-		"Me!"
+		"TehPicix"
 	],
 	"contact": {
 		"homepage": "https://fabricmc.net/",
@@ -16,19 +16,20 @@
 	"environment": "*",
 	"entrypoints": {
 		"main": [
-			"me.tehpicix.CrystalArmor"
+			"me.tehpicix.crystalarmor.CrystalArmor"
+		],
+		"modmenu": [
+			"me.tehpicix.crystalarmor.config.ModMenu"
 		]
 	},
 	"mixins": [
 		"crystal-armor.mixins.json"
 	],
 	"depends": {
-		"fabricloader": ">=0.16.14",
-		"minecraft": "~1.21.4",
-		"java": ">=21",
-		"fabric-api": "*"
-	},
-	"suggests": {
-		"another-mod": "*"
+		"fabricloader": ">=0.14.0",
+		"minecraft": "1.21.x",
+		"fabric": "*",
+		"modmenu": "*",
+		"cloth-config": ">=11.1.106"
 	}
 }
