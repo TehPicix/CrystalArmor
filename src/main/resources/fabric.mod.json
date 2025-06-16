@@ -11,7 +11,7 @@
 	"environment": "client",
 	"entrypoints": {
 		"main": [
-			"me.tehpicix.crystalarmor.CrystalArmor"
+			"me.tehpicix.crystalarmor.Main"
 		],
 		"modmenu": [
 			"me.tehpicix.crystalarmor.config.ModMenu"

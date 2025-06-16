@@ -71,24 +71,52 @@ public class World {
 				return;
 
 			// Increment the tick counter
-			if (tickCounter >= 0) tickCounter++;
+			if (tickCounter >= 0)
+				tickCounter++;
 
 			// Respect the configuration setting
 			if (!Config.INSTANCE.enabled)
 				return;
 
-			// Determine if the player is in range of an end crystal
-			if (CrystalLocater.listCrystalsInRange(client).size() == 0) {
+			// If the player is in range
+			boolean inRange = CrystalLocater.listCrystalsInRange(client).size() > 0;
+			boolean inTrace = Config.INSTANCE.useTracing ? CrystalLocater.checkLineOfSight(client) : true;
+			if (inRange && inTrace) {
+				switchToBestArmor();
 				return;
-	   		}
+			}
 
-			// Use line of sight tracing if enabled
-			if (Config.INSTANCE.useTracing && !CrystalLocater.checkLineOfSight(client)){
+			// If theres nothing in the previous loadout, we don't need to switch
+			if (loadout.isEmpty())
 				return;
-	   		}
 
-			// Switch to the blast armor
-			switchToBestArmor();
+			// Start the tick counter if not already counting
+			if (tickCounter < 0)
+				tickCounter = 0;
+			
+			// If were done counting, reset the counter
+			if (tickCounter >= Config.INSTANCE.switchDelay) {
+				tickCounter = -1;
+
+				// SWITCH BACK
+				client.player.sendMessage(Text.literal("Switching back to previous armor..."), false);
+				loadout.clear();
+	
+   			}
+
+			// // Determine if the player is in range of an end crystal
+			// if (CrystalLocater.listCrystalsInRange(client).size() == 0) {
+			// 	if(loadout.size() > 0)
+			// 	return;
+	   		// }
+
+			// // Use line of sight tracing if enabled
+			// if (Config.INSTANCE.useTracing && !CrystalLocater.checkLineOfSight(client)){
+			// 	return;
+	   		// }
+
+			// // Switch to the blast armor
+			// switchToBestArmor();
 
 		});
 	}
