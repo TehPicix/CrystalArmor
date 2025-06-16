@@ -13,13 +13,13 @@
 		"main": [
 			"me.tehpicix.crystalarmor.Main"
 		],
+		"client": [
+			"me.tehpicix.crystalarmor.Main"
+		],
 		"modmenu": [
 			"me.tehpicix.crystalarmor.config.ModMenu"
 		]
 	},
-	"mixins": [
-		"crystal-armor.mixins.json"
-	],
 	"depends": {
 		"fabricloader": ">=0.14.0",
 		"minecraft": "1.21.x",
