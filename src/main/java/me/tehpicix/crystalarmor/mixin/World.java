@@ -20,7 +20,6 @@ import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.item.equipment.EquipmentType;
 import net.minecraft.server.MinecraftServer;
-import net.minecraft.text.Text;
 
 @Mixin(MinecraftServer.class)
 public class World {
@@ -58,7 +57,10 @@ public class World {
 	);
 
 	// Store the preferred armor slots
-    protected HashMap<Integer, ItemStack> loadout = new HashMap<>();
+	protected HashMap<Integer, ItemStack> loadout = new HashMap<>();
+	
+	// A tick counter since the last armor switch, -1 means not counting
+	private int tickCounter = -1;
 
 	@Inject(at = @At("HEAD"), method = "loadWorld")
 	private void init(CallbackInfo info) {
@@ -68,24 +70,35 @@ public class World {
 			if (client.player == null || client.player.getWorld() == null)
 				return;
 
+			// Increment the tick counter
+			if (tickCounter >= 0) tickCounter++;
+
 			// Respect the configuration setting
 			if (!Config.INSTANCE.enabled)
 				return;
 
 			// Determine if the player is in range of an end crystal
-			if (CrystalLocater.listCrystalsInRange(client).size() == 0)
+			if (CrystalLocater.listCrystalsInRange(client).size() == 0) {
 				return;
+	   		}
 
 			// Use line of sight tracing if enabled
-			if (Config.INSTANCE.useTracing && !CrystalLocater.checkLineOfSight(client))
+			if (Config.INSTANCE.useTracing && !CrystalLocater.checkLineOfSight(client)){
 				return;
+	   		}
 
-			// Check if the player is in a safe position
+			// Switch to the blast armor
 			switchToBestArmor();
 
 		});
 	}
 	
+	/**
+	 * Switches the player's armor to the best available items based on the defined armor types.
+	 * It iterates through each armor type, finds the best item in the player's inventory,
+	 * and swaps it with the currently equipped item if it's better. Additionally, saves
+	 * the current item in the loadout to swap back later.
+	 */
 	private void switchToBestArmor() {
 
 		MinecraftClient client = MinecraftClient.getInstance();
@@ -129,24 +142,15 @@ public class World {
 			}
 
 			// If the best item is already equipped, skip
-   			if (bestItem != null && bestItem.equals(currentItem))
+			if (bestItem != null && bestItem.equals(currentItem) || bestItem == null)
 				continue;
 
-			client.player.sendMessage(Text.literal("Found §c" + equipment.size() + "x §rof §c" + type.getName() + " §rslot: §c" + slot + " §rscore: §c" + ItemManager.rankItem(client.player.getInventory().getStack(slot))), false);
-			
-			// // Find the best item based on ranking each
-			// ItemStack bestItem = null;
-			// for (ItemStack stack : equipment) {
-			// 	if(bestItem != null && ItemManager.rankItem(stack) > ItemManager.rankItem(bestItem)) bestItem = stack;
-			// }
+			// Save the current item in the loadout
+			loadout.put(slot, currentItem);
 
-			// int slot = type.getEquipmentSlot().getEntitySlotId() + 36;
-			// int bestItemSlot = bestItem == null  ? -1 : client.player.getInventory().getSlotWithStack(bestItem);
-
-			// boolean isBestItem = bestItemSlot == slot;
-
-			// client.player.sendMessage(Text.literal((isBestItem ? "§a" : "§c") + type.getName()), false);
-			
+			// Swap the items in the inventory
+			int bestItemSlot = client.player.getInventory().getSlotWithStack(bestItem);
+			ItemManager.swapSlots(slot, bestItemSlot);
 
    		}
 
