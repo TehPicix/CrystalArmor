@@ -38,7 +38,7 @@ public class ConfigScreen {
             .build());
             
         general.addEntry(entryBuilder
-            .startBooleanToggle(Text.literal("Require Line of Sight"), true)
+            .startBooleanToggle(Text.literal("Require Line of Sight"), Config.INSTANCE.useTracing)
             .setDefaultValue(true)
             .setTooltip(Text.literal("If enabled, uses ray tracing to determine if the player has line of sight to the crystal"))
             .setSaveConsumer(newValue -> {
