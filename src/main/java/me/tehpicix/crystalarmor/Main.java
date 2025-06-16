@@ -52,6 +52,9 @@ public class Main implements ModInitializer, ClientModInitializer {
 	);
 
 	// Store the preferred armor slots
+	protected HashMap<Integer, ItemStack> originalLoadout = new HashMap<>();
+
+	// Store the swapped armor items
 	protected HashMap<Integer, ItemStack> loadout = new HashMap<>();
 	
 	// A tick counter since the last armor switch, -1 means not counting
@@ -88,19 +91,27 @@ public class Main implements ModInitializer, ClientModInitializer {
 			}
 
 			// If were not in range, start ticking the counter
-			if (!loadout.isEmpty() && tickCounter < 0)
+			if (!originalLoadout.isEmpty() && tickCounter < 0)
 				tickCounter = 0;
 
 			// If the tick counter has reached the cooldown, stop counting
 			if (tickCounter >= Config.INSTANCE.cooldown) {
 				tickCounter = -1;
 
-				for (Map.Entry<Integer, ItemStack> entry : loadout.entrySet()) {
+				for (Map.Entry<Integer, ItemStack> entry : originalLoadout.entrySet()) {
+					
 					int slot = entry.getKey();
-					int currentSlot = client.player.getInventory().getSlotWithStack(entry.getValue());
+					ItemStack originalItem = entry.getValue();
+					ItemStack expectedItem = loadout.get(slot);
+					ItemStack currentItem = client.player.getInventory().getStack(slot);
+
+					if (expectedItem != null && !ItemStack.areEqual(expectedItem, currentItem)) continue;		
+					int currentSlot = client.player.getInventory().getSlotWithStack(originalItem);
 					ItemManager.swapSlots(slot, currentSlot);
+					
 				}
 
+				originalLoadout.clear();
 				loadout.clear();
 
 			}
@@ -162,7 +173,8 @@ public class Main implements ModInitializer, ClientModInitializer {
 				continue;
 
 			// Save the current item in the loadout
-			loadout.put(slot, currentItem.copy());
+			originalLoadout.put(slot, currentItem.copy());
+			loadout.put(slot, bestItem.copy());
 
 			// Swap the items in the inventory
 			int bestItemSlot = client.player.getInventory().getSlotWithStack(bestItem);
