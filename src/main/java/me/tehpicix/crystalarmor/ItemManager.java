@@ -7,14 +7,18 @@ import net.minecraft.client.MinecraftClient;
 import net.minecraft.enchantment.Enchantment;
 import net.minecraft.enchantment.EnchantmentHelper;
 import net.minecraft.enchantment.Enchantments;
+import net.minecraft.inventory.Inventory;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.Items;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.registry.entry.RegistryEntry.Reference;
+import net.minecraft.screen.ScreenHandler;
+import net.minecraft.screen.slot.Slot;
+import net.minecraft.screen.slot.SlotActionType;
 
-public class ItemEvaluator {
+public class ItemManager {
 
     /**
      * A map of enchantments and their associated weights for calculating blast resistance.
@@ -86,7 +90,7 @@ public class ItemEvaluator {
      * @param stack The item stack to evaluate.
      * @return The calculated blast resistance score.
      */
-    public static float getBlastResistance(ItemStack stack) {
+    public static float rankItem(ItemStack stack) {
         float score = 0f;
         MinecraftClient client = MinecraftClient.getInstance();
         for (var entry : ENCHANTMENT_WEIGHTS.entrySet()) {
@@ -100,9 +104,51 @@ public class ItemEvaluator {
         }
         for (var entry : MATERIAL_WEIGHTS.entrySet()) {
             var weight = entry.getValue();
-            if(entry.getKey().contains(stack.getItem())) score *= weight;
+            if (entry.getKey().contains(stack.getItem()))
+                score *= weight;
         }
         return score;
     }
+
+    /**
+     * Swap two slots by their *Inventory* indices (the same numbers you see
+     * in the raw PlayerInventory: 0–8 hotbar, 9–35 main, 36–39 armor, 40 offhand).
+     * This will work on any vanilla server.
+     */
+    public static void swapSlots(int invIndexA, int invIndexB) {
+
+        MinecraftClient client = MinecraftClient.getInstance();
+
+        if (client.player == null || client.interactionManager == null)
+            return;
+        
+        ScreenHandler handler = client.player.currentScreenHandler;
+        int windowId = handler.syncId;
+
+        int slotA = locateSlot(handler, client.player.getInventory(), invIndexA);
+        int slotB = locateSlot(handler, client.player.getInventory(), invIndexB);
+        if (slotA == -1 || slotB == -1)
+            return;
+        
+        client.interactionManager.clickSlot(windowId, slotA, 0, SlotActionType.PICKUP, client.player);
+        client.interactionManager.clickSlot(windowId, slotB, 0, SlotActionType.PICKUP, client.player);
+        client.interactionManager.clickSlot(windowId, slotA, 0, SlotActionType.PICKUP, client.player);
+    }
+
+    
+
+    /**
+     * Finds the index in ScreenHandler.slots[] that corresponds to
+     * inventory slot `invIndex` in the given Inventory.
+     */
+    private static int locateSlot(ScreenHandler handler, Inventory inv, int invIndex) {
+        for (int i = 0; i < handler.slots.size(); i++) {
+            Slot s = handler.slots.get(i);
+            if (s.inventory == inv && s.getIndex() == invIndex) return i;
+        }
+        return -1;
+    }
+    
+
 
 }
