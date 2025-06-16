@@ -86,37 +86,23 @@ public class World {
 				return;
 			}
 
-			// If theres nothing in the previous loadout, we don't need to switch
-			if (loadout.isEmpty())
-				return;
-
-			// Start the tick counter if not already counting
-			if (tickCounter < 0)
+			// If were not in range, start ticking the counter
+			if (!loadout.isEmpty() && tickCounter < 0)
 				tickCounter = 0;
-			
-			// If were done counting, reset the counter
-			if (tickCounter >= Config.INSTANCE.switchDelay) {
+
+			// If the tick counter has reached the cooldown, stop counting
+			if (tickCounter >= Config.INSTANCE.cooldown) {
 				tickCounter = -1;
 
-				// SWITCH BACK
-				client.player.sendMessage(Text.literal("Switching back to previous armor..."), false);
+				for (Map.Entry<Integer, ItemStack> entry : loadout.entrySet()) {
+					int slot = entry.getKey();
+					int currentSlot = client.player.getInventory().getSlotWithStack(entry.getValue());
+					ItemManager.swapSlots(slot, currentSlot);
+				}
+
 				loadout.clear();
-	
-   			}
 
-			// // Determine if the player is in range of an end crystal
-			// if (CrystalLocater.listCrystalsInRange(client).size() == 0) {
-			// 	if(loadout.size() > 0)
-			// 	return;
-	   		// }
-
-			// // Use line of sight tracing if enabled
-			// if (Config.INSTANCE.useTracing && !CrystalLocater.checkLineOfSight(client)){
-			// 	return;
-	   		// }
-
-			// // Switch to the blast armor
-			// switchToBestArmor();
+			}
 
 		});
 	}
@@ -174,7 +160,7 @@ public class World {
 				continue;
 
 			// Save the current item in the loadout
-			loadout.put(slot, currentItem);
+			loadout.put(slot, currentItem.copy());
 
 			// Swap the items in the inventory
 			int bestItemSlot = client.player.getInventory().getSlotWithStack(bestItem);
